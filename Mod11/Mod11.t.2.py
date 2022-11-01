@@ -76,6 +76,7 @@ class Sahkoauto(Auto):
 
 tesla = Sahkoauto('ABC-15', 180, 0, 0, 0, 52.5)
 tesla.auton_tiedot()
+#tesla.kulje(int(input('Kuinka monta tuntia auto ajaa: ')))
 tesla.kulje(3)
 tesla.tulosta_tiedot()
 
