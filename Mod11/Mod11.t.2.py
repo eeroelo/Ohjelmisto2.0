@@ -1,88 +1,91 @@
 import random
 
 class Auto:
-    def __init__(self, rekisteritunnus, huippunopeus, tämänhetkinen_nopeus, kuljettu_matka_h, tot_aika):
+    def __init__(self, rekisteritunnus, huippunopeus, fuel, type):
         self.rekisteritunnus = rekisteritunnus
         self.huippunopeus = huippunopeus
-        self.tämänhetkinen_nopeus = tämänhetkinen_nopeus
-        self.kuljettu_matka_h = kuljettu_matka_h
-        self.tot_aika = tot_aika
+        self.tämänhetkinen_nopeus = 0
+        self.kuljettu_matka = 0
+        self.tot_aika = 0
+        self.fuel = fuel
+        self.type = type
 
 
-
-    def kiihdyta(self, velo_change):
-        self.tämänhetkinen_nopeus += velo_change
-        ylaraja = self.huippunopeus
-        alaraja = 0
-        if self.tämänhetkinen_nopeus > ylaraja:
+# Nopeus arvotaan randomilla, se ei voi ylittää max nopeutta.
+    def kulje(self, tot_aika):
+        self.tämänhetkinen_nopeus = random.randint(50, 200)
+        if self.tämänhetkinen_nopeus > self.huippunopeus:
             self.tämänhetkinen_nopeus = self.huippunopeus
-        elif self.tämänhetkinen_nopeus < alaraja:
-            self.tämänhetkinen_nopeus = 0
 
-    def kulje(self, matka_h):
-        self.tot_aika += matka_h
-        matka_h = matka_h * self.tämänhetkinen_nopeus
-        self.kuljettu_matka_h += matka_h
+    # Kuljettu matka tunteina
+        self.tot_aika += tot_aika
+
+    # Auton tyyppi, eli type, määrää miten kulutus lasketaan.
+        # Polttomoottori:
+        if self.type == 'carbon':
+            self.fuel -= tot_aika * self.tämänhetkinen_nopeus // 100 * 6.4
+
+        # Sähkömoottori:
+        elif self.type == 'elec':
+            self.fuel -= (tot_aika * self.tämänhetkinen_nopeus) // 100 * 7.2
+
+    # Polttoaine ei voi olla alle 0.
+        if self.fuel < 0:
+            self.fuel = 0
+
+    # Kuljettu matka kilometreinä.
+        self.kuljettu_matka = self.tot_aika * self.tämänhetkinen_nopeus
+
+
 
 #-----------------------------------------------------------------------------------
 
 class Polttomoottoriauto(Auto):
-    def __init__(self, rekisteritunnus, huippunopeus, tämänhetkinen_nopeus, kuljettu_matka_h, tot_aika, tankki):
-            Auto.__init__(self, rekisteritunnus, huippunopeus, tämänhetkinen_nopeus, kuljettu_matka_h, tot_aika)
-            self.tankki = tankki
+    def __init__(self, rekisteritunnus, huippunopeus, fuel, type):
+            Auto.__init__(self, rekisteritunnus, huippunopeus,fuel, type)
 
-    def kulje(self, tot_aika):
-        self.tämänhetkinen_nopeus = random.randint(50, 165)
-        self.tot_aika += tot_aika
-        self.tankki -= tot_aika * self.tämänhetkinen_nopeus//100 * 6.4
-        if self.tankki < 0:
-            self.tankki = 0
-
-
+    #Polttomoottoriauton tiedot
     def auton_tiedot(self):
-        print(f'Auton {self.rekisteritunnus} huippunopeus on {self.huippunopeus}km/h ja tankin vetoisuus {self.tankki}'
-              f' litraa.')
+        print(f'Auton {self.rekisteritunnus} huippunopeus on {self.huippunopeus}km/h ja tankin vetoisuus {self.fuel}'
+              f' litraa. Auto on tyypiltään polttomoottoriauto.')
 
     def tulosta_tiedot(self):
-        print(f'Auton {self.rekisteritunnus} huippunopeus on {self.huippunopeus}km/h. Auto kulkee {self.tot_aika}h'
-              f' nopeudella {self.tämänhetkinen_nopeus}km/h jonka jälkeen tankissa on noin {self.tankki //1} litraa')
+        print(f'Auto {self.rekisteritunnus} kulkee {self.tot_aika}h'
+              f' nopeudella {self.tämänhetkinen_nopeus}km/h jonka jälkeen tankissa on noin {self.fuel //1} litraa.'
+              f' Kuljettu matka kyseisessä ajassa <{self.kuljettu_matka}km>')
 
 
 # -----------------------------------------------------------------------------------
 
 class Sahkoauto(Auto):
-    def __init__(self, rekisteritunnus, huippunopeus, tämänhetkinen_nopeus, kuljettu_matka_h, tot_aika, akku):
-        Auto.__init__(self, rekisteritunnus, huippunopeus, tämänhetkinen_nopeus, kuljettu_matka_h, tot_aika)
-        self.lataus = akku
+    def __init__(self, rekisteritunnus, huippunopeus, fuel, type):
+            Auto.__init__(self, rekisteritunnus, huippunopeus,fuel, type)
 
-    def kulje(self, tot_aika):
-        self.tämänhetkinen_nopeus = random.randint(50, 180)
-        self.tot_aika += tot_aika
-        self.lataus -= tot_aika * (1.70 * self.tämänhetkinen_nopeus//100)
-        if self.lataus < 0:
-            self.lataus = 0
-
+    # Sähköauton tiedot
     def auton_tiedot(self):
-        print(f'Auton {self.rekisteritunnus} huippunopeus on {self.huippunopeus}km/h ja akun maksimilataus on '
-              f'{self.lataus}kWh')
-
+        print(f'Auton {self.rekisteritunnus} huippunopeus on {self.huippunopeus}km/h ja akun maksimilataus '
+              f'{self.fuel}kWh. Auto on tyypiltään sähköauto.')
 
 
     def tulosta_tiedot(self):
-        print(f'Auton {self.rekisteritunnus} huippunopeus on {self.huippunopeus}km/h. Auto kulkee {self.tot_aika}h'
-              f' nopeudella {self.tämänhetkinen_nopeus}km/h jonka jälkeen akun lataus on {self.lataus}kWh')
+        print(f'Auto {self.rekisteritunnus} kulkee {self.tot_aika}h nopeudella {self.tämänhetkinen_nopeus}km/h '
+              f'jonka jälkeen akun lataus on {self.fuel}kWh. Kuljettu matka kyseisessä ajassa <{self.kuljettu_matka}km>')
+
+
+# -----------------------------------------------------------------------------------
 
 
 
-tesla = Sahkoauto('ABC-15', 180, 0, 0, 0, 52.5)
+print('----------------------------------------------------------------')
+
+toyota = Polttomoottoriauto('ACD-123', 165, 32.3, 'carbon')
+toyota.auton_tiedot()
+toyota.kulje(3)
+toyota.tulosta_tiedot()
+print('----------------------------------------------------------------')
+tesla = Sahkoauto('ABC-15', 180, 52.5, 'elec')
 tesla.auton_tiedot()
 #tesla.kulje(int(input('Kuinka monta tuntia auto ajaa: ')))
 tesla.kulje(3)
 tesla.tulosta_tiedot()
-
-
-#toyota = Polttomoottoriauto('ACD-123', 165, 0, 0, 0, 32.3)
-#toyota.auton_tiedot()
-#toyota.kulje(3)
-#toyota.tulosta_tiedot()
 
